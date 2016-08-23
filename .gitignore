@@ -142,7 +142,7 @@ publish/
 ## passwords
 *.pubxml
 *.psm1
-*.ps1
+#*.ps1
 
 *.publishproj
 
