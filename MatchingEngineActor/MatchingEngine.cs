@@ -86,7 +86,7 @@ namespace MatchingEngineActor
             };
 
             var ev = GetEvent<IMatchingEngineEvents>();
-            ev.AssetPairUpdated(feedData);
+            ev.AssetPairPriceUpdated(feedData);
         }
     }
 }
