@@ -81,10 +81,12 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Proxy\DictionaryProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MatchingEngine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ActorEventSource.cs" />
+    <Compile Include="Proxy\IProxy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PackageRoot\ServiceManifest.xml" />

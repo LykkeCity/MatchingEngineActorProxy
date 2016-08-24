@@ -8,4 +8,7 @@
     <Parameter Name="CredentialType" Value="None" />
   </Section>
   <!-- The content will be generated during build -->
+  <Section Name="ActorSettings">
+    <Parameter Name="DictionaryServiceUrl" Value="fabric:/DictionaryApp" />
+  </Section>
 </Settings>

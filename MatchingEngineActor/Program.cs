@@ -11,7 +11,7 @@ namespace MatchingEngineActor
             try
             {
                 ActorRuntime.RegisterActorAsync<MatchingEngine>(
-                        (context, actorType) => new ActorService(context, actorType, () => new MatchingEngine()))
+                        (context, actorType) => new ActorService(context, actorType, () => new MatchingEngine(context)))
                     .GetAwaiter()
                     .GetResult();
 

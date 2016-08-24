@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Fabric;
+using System.Linq;
 using System.Threading.Tasks;
 using Common.Extenstions;
 using Core.Domain.Assets.Models;
 using Core.Domain.Dictionary;
+using Core.Domain.Feed;
 using Core.Domain.MatchingEngine;
+using MatchingEngineActor.Proxy;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace MatchingEngineActor
@@ -11,56 +16,33 @@ namespace MatchingEngineActor
     [StatePersistence(StatePersistence.Persisted)]
     internal class MatchingEngine : Actor, IMatchingEngine
     {
+        private StatefulServiceContext _context;
         private double _balance;
-        private IActorTimer updateTimer;
+        private IActorTimer _updateTimer;
+        private readonly IDictionaryService _dictionaryProxy;
+
+        public MatchingEngine(StatefulServiceContext context)
+        {
+            this._context = context;
+            _dictionaryProxy = new DictionaryProxy().Connect(context);
+        }
 
         public Task InitAsync()
         {
             return TaskEx.Empty;
         }
 
-        public Task<string> HandleMarketOrderAsync(string clientId, string assetPairId, OrderAction orderAction,
-            double volume, bool straight)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task HandleLimitOrderAsync(string clientId, string assetPairId, OrderAction orderAction, double volume,
-            double price)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<CashInOutResponse> CashInOutBalanceAsync(string clientId, string assetId, double balanceDelta,
-            bool sendToBlockchain,
-            string correlationId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateBalanceAsync(string clientId, string assetId, double value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task CancelLimitOrderAsync(int orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> UpdateWalletCredsForClient(string clientId)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override Task OnActivateAsync()
+        protected override async Task OnActivateAsync()
         {
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
 
-            updateTimer = RegisterTimer(UpdateNumber, null, TimeSpan.FromSeconds(3),
+            var assetPairs = await _dictionaryProxy.GetAssetPairsAsync();
+
+            await this.StateManager.TryAddStateAsync("AssetPairs", assetPairs);
+
+            _updateTimer = RegisterTimer(UpdateNumber, null, TimeSpan.FromSeconds(3),
                 TimeSpan.FromSeconds(3));
 
-            return TaskEx.Empty;
         }
 
         private Task UpdateNumber(object obj)
