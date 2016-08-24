@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Common.Extenstions;
-using MatchingEngine.Core.Exchange;
+using Core.Domain.Assets.Models;
+using Core.Domain.Dictionary;
+using Core.Domain.MatchingEngine;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace MatchingEngineActor

@@ -40,6 +40,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Core.Domain, Version=1.0.0.5, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Core.Domain.1.0.0.5\lib\net452\Core.Domain.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Actors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Actors.2.1.163\lib\net45\Microsoft.ServiceFabric.Actors.dll</HintPath>
       <Private>True</Private>
@@ -89,10 +93,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MatchingEngine.Core\MatchingEngine.Core.csproj">
-      <Project>{A17E7D6D-0FC2-41A8-B951-46F0C5973C82}</Project>
-      <Name>MatchingEngine.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MatchingEngine.Utils\MatchingEngine.Utils.csproj">
       <Project>{F81DC784-8769-4EA6-893A-3183390469F9}</Project>
       <Name>MatchingEngine.Utils</Name>
