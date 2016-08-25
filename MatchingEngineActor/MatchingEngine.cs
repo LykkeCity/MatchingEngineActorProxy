@@ -4,10 +4,10 @@ using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Extenstions;
-using Core.Domain.Assets.Models;
-using Core.Domain.Dictionary;
-using Core.Domain.Feed;
-using Core.Domain.MatchingEngine;
+using Lykke.Core.Domain.Assets.Models;
+using Lykke.Core.Domain.Dictionary;
+using Lykke.Core.Domain.Feed;
+using Lykke.Core.Domain.MatchingEngine;
 using MatchingEngineActor.Proxy;
 using Microsoft.ServiceFabric.Actors.Runtime;
 

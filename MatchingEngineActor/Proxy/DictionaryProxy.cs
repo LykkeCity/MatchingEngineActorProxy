@@ -1,5 +1,5 @@
 ﻿using System.Fabric;
-using Core.Domain.Dictionary;
+using Lykke.Core.Domain.Dictionary;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Client;
 

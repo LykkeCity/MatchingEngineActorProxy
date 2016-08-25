@@ -1,5 +1,5 @@
 ﻿using System.Fabric;
-using Core.Domain.Dictionary;
+using Lykke.Core.Domain.Dictionary;
 
 namespace MatchingEngineActor.Proxy
 {
