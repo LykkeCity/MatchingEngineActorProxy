@@ -40,8 +40,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lykke.Core.Domain, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lykke.Core.Domain.1.0.1\lib\net452\Lykke.Core.Domain.dll</HintPath>
+    <Reference Include="Lykke.Core.Domain, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lykke.Core.Domain.1.0.3\lib\net452\Lykke.Core.Domain.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Actors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
@@ -97,6 +97,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MatchingEngine.DataAccess\MatchingEngine.DataAccess.csproj">
+      <Project>{D104E6E7-A088-451C-8943-BF9E05198EA3}</Project>
+      <Name>MatchingEngine.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MatchingEngine.Utils\MatchingEngine.Utils.csproj">
       <Project>{F81DC784-8769-4EA6-893A-3183390469F9}</Project>
       <Name>MatchingEngine.Utils</Name>
