@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Lykke.Core.Domain.Assets;
 using Lykke.Core.Domain.Exchange;
 using Lykke.Core.Domain.Exchange.Models;
+using MatchingEngine.Utils.Extensions;
 
 namespace MatchingEngine.DataAccess.Exchange
 {
@@ -47,6 +48,9 @@ namespace MatchingEngine.DataAccess.Exchange
 
         public Task<IEnumerable<OrderInfo>> GetAllAsync(string accountId)
         {
+            if (_orders.Count == 0)
+                return TaskEx.Null<IEnumerable<OrderInfo>>();
+
             IEnumerable<OrderInfo> accountOrders = _orders[accountId];
 
             return Task.FromResult(accountOrders);
