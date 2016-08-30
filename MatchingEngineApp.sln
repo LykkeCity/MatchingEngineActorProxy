@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.DataAccess",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6B05F528-A164-4D22-A0B1-D681FD5F120C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.DataAccess.Tests", "MatchingEngine.DataAccess.Tests\MatchingEngine.DataAccess.Tests.csproj", "{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.DataAccess.Tests", "Tests\MatchingEngine.DataAccess.Tests\MatchingEngine.DataAccess.Tests.csproj", "{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
