@@ -62,7 +62,7 @@ namespace MatchingEngineActor
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<OrderInfo>> GetActivePositionsAsync(string accountId)
+        public async Task<IEnumerable<OrderInfo>> GetActiveOrdersAsync(string accountId)
         {
             return await _orderInfoRepository.GetAllAsync(accountId);
         }

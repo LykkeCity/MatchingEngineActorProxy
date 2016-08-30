@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Core.Domain.Assets;
 using Lykke.Core.Domain.Exchange;
@@ -34,7 +35,7 @@ namespace MatchingEngine.DataAccess.Exchange
                 CreatedAt = currentQuote.DateTime
             };
 
-            orderInfo.Price = OrderInfo.OrderAction(orderInfo) == OrderAction.Buy ? currentQuote.Ask : currentQuote.Bid;
+            orderInfo.Price = orderInfo.OrderAction == OrderAction.Buy ? currentQuote.Ask : currentQuote.Bid;
 
             if (_orders.ContainsKey(accountId))
             {
@@ -56,9 +57,30 @@ namespace MatchingEngine.DataAccess.Exchange
             return Task.FromResult(accountOrders);
         }
 
-        public Task DeleteAsync(string orderId)
+        public Task<OrderInfo> GetAsync(string accountId, string orderId)
         {
-            throw new System.NotImplementedException();
+            if(_orders.Count == 0)
+                throw new InvalidOperationException("no orders exist");
+
+            if(!_orders.ContainsKey(accountId))
+                throw new InvalidOperationException("account doesn't have any order");
+
+            if(_orders[accountId].All(o => o.Id != orderId))
+                throw new InvalidOperationException("invalid order");
+
+            return Task.FromResult(_orders[accountId].FirstOrDefault(o => o.Id == orderId));
+        }
+
+        public async Task DeleteAsync(string accountId, string orderId)
+        {
+            var order = await GetAsync(accountId, orderId);
+
+            _orders[accountId].Remove(order);
+
+            if (_orders[accountId] == null)
+            {
+                _orders.Remove(accountId);
+            }
         }
     }
 }
