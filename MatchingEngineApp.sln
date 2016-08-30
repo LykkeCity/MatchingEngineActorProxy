@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6B05F528
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.DataAccess.Tests", "Tests\MatchingEngine.DataAccess.Tests\MatchingEngine.DataAccess.Tests.csproj", "{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.Actor.Tests", "Tests\MatchingEngine.Actor.Tests\MatchingEngine.Actor.Tests.csproj", "{E7F1B1FE-0706-416E-8350-EC28616DB687}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,11 +63,20 @@ Global
 		{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD}.Release|x64.ActiveCfg = Release|Any CPU
 		{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD}.Release|x64.Build.0 = Release|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Debug|x64.Build.0 = Debug|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Release|x64.ActiveCfg = Release|Any CPU
+		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD} = {6B05F528-A164-4D22-A0B1-D681FD5F120C}
+		{E7F1B1FE-0706-416E-8350-EC28616DB687} = {6B05F528-A164-4D22-A0B1-D681FD5F120C}
 	EndGlobalSection
 EndGlobal
