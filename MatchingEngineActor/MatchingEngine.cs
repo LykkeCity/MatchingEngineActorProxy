@@ -81,14 +81,14 @@ namespace MatchingEngineActor
 
             await StateManager.TryAddStateAsync("AssetPairs", assetPairs);
 
-            _updateTimer = RegisterTimer(UpdateNumber, null, TimeSpan.FromSeconds(3),
+            _updateTimer = RegisterTimer(UpdateAccountBalanceAsync, null, TimeSpan.FromSeconds(3),
                 TimeSpan.FromSeconds(3));
 
-            _updateAssetTimer = RegisterTimer(UpdateAssetPair, null, TimeSpan.FromSeconds(2),
+            _updateAssetTimer = RegisterTimer(UpdateAssetPairAsync, null, TimeSpan.FromSeconds(2),
                 TimeSpan.FromSeconds(2));
         }
 
-        private async Task UpdateNumber(object obj)
+        private async Task UpdateAccountBalanceAsync(object obj)
         {
             var rnd = new Random();
 
@@ -103,7 +103,7 @@ namespace MatchingEngineActor
             }
         }
 
-        private async Task UpdateAssetPair(object obj)
+        private async Task UpdateAssetPairAsync(object obj)
         {
             var assetPairs = (await StateManager.GetStateAsync<IEnumerable<AssetPair>>("AssetPairs")).ToList();
 
