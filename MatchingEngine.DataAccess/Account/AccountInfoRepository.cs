@@ -11,7 +11,7 @@ namespace MatchingEngine.DataAccess.Account
     {
         private const double _defaultBalance = 50000;
         private const double _defaultShoulder = 200;
-        private const string _defaultBaseAssetId = "USD";
+        private const string _defaultBaseAssetId = "EUR";
         private static readonly Dictionary<string, AccountInfo> _accounts = new Dictionary<string, AccountInfo>();
 
         public async Task<AccountInfo> GetAsync(string accountId)
