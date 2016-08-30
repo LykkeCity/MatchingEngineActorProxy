@@ -26,6 +26,7 @@ namespace MatchingEngineActor
         private readonly IAccountInfoRepository _accountInfoRepository;
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;
         private readonly IOrderInfoRepository _orderInfoRepository;
+        private readonly ITransactionHistoryRepository _transactionHistoryRepository;
         private readonly IDictionaryService _dictionaryProxy;
         private StatefulServiceContext _context;
         private IActorTimer _updateAssetTimer;
@@ -40,6 +41,7 @@ namespace MatchingEngineActor
             _accountInfoRepository = new AccountInfoRepository();
             _assetPairQuoteRepository = new AssetPairQuoteRepository();
             _orderInfoRepository = new OrderInfoRepository(_assetPairQuoteRepository);
+            _transactionHistoryRepository = new TransactionHistoryRepository();
         }
 
         public Task InitAsync()
@@ -57,9 +59,15 @@ namespace MatchingEngineActor
             await _orderInfoRepository.AddAsync(accountId, assetPairId, volume);
         }
 
-        public Task ClosePositionAsync(string accountId, string orderId)
+        public async Task CloseOrderAsync(string accountId, string orderId)
         {
-            throw new NotImplementedException();
+            var activeOrder = await _orderInfoRepository.GetAsync(accountId, orderId);
+
+            var quote = await _assetPairQuoteRepository.GetAsync(activeOrder.AssetPairId);
+
+            await _transactionHistoryRepository.AddAsync(activeOrder, quote);
+
+            await _orderInfoRepository.DeleteAsync(accountId, orderId);
         }
 
         public async Task<IEnumerable<OrderInfo>> GetActiveOrdersAsync(string accountId)
