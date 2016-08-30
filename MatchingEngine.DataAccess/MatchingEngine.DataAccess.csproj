@@ -82,6 +82,7 @@
     <Compile Include="Account\AccountInfoRepository.cs" />
     <Compile Include="Asset\AssetPairQuoteRepository.cs" />
     <Compile Include="Exchange\OrderInfoRepository.cs" />
+    <Compile Include="Exchange\TransactionHistoryRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
