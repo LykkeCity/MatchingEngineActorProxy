@@ -11,17 +11,17 @@ using Lykke.Core.Domain.Dictionary;
 using Lykke.Core.Domain.Exchange;
 using Lykke.Core.Domain.Exchange.Models;
 using Lykke.Core.Domain.MatchingEngine;
+using MatchingEngine.Actor.Proxy;
 using MatchingEngine.DataAccess.Account;
 using MatchingEngine.DataAccess.Asset;
 using MatchingEngine.DataAccess.Exchange;
 using MatchingEngine.Utils.Extensions;
-using MatchingEngineActor.Proxy;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
-namespace MatchingEngineActor
+namespace MatchingEngine.Actor
 {
     [StatePersistence(StatePersistence.Persisted)]
-    internal class MatchingEngine : Actor, IMatchingEngine
+    internal class MatchingEngine : Microsoft.ServiceFabric.Actors.Runtime.Actor, IMatchingEngine
     {
         private readonly IAccountInfoRepository _accountInfoRepository;
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;

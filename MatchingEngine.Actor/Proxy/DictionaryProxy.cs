@@ -3,7 +3,7 @@ using Lykke.Core.Domain.Dictionary;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Client;
 
-namespace MatchingEngineActor.Proxy
+namespace MatchingEngine.Actor.Proxy
 {
     public class DictionaryProxy : IProxy
     {

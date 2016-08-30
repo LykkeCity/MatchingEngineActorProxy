@@ -2,7 +2,7 @@
 using System.Threading;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
-namespace MatchingEngineActor
+namespace MatchingEngine.Actor
 {
     internal static class Program
     {
@@ -10,8 +10,8 @@ namespace MatchingEngineActor
         {
             try
             {
-                ActorRuntime.RegisterActorAsync<MatchingEngine>(
-                        (context, actorType) => new ActorService(context, actorType, () => new MatchingEngine(context)))
+                ActorRuntime.RegisterActorAsync<global::MatchingEngine.Actor.MatchingEngine>(
+                        (context, actorType) => new ActorService(context, actorType, () => new global::MatchingEngine.Actor.MatchingEngine(context)))
                     .GetAwaiter()
                     .GetResult();
 

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors.Runtime;
 
-namespace MatchingEngineActor
+namespace MatchingEngine.Actor
 {
     [EventSource(Name = "MyCompany-MatchingEngine-MatchingEngineActor")]
     internal sealed class ActorEventSource : EventSource
@@ -60,7 +59,7 @@ namespace MatchingEngineActor
         }
 
         [NonEvent]
-        public void ActorMessage(Actor actor, string message, params object[] args)
+        public void ActorMessage(Microsoft.ServiceFabric.Actors.Runtime.Actor actor, string message, params object[] args)
         {
             if (this.IsEnabled()
                 && actor.Id != null

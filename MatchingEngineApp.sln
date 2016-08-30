@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "MatchingEngine", "MatchingEngine\MatchingEngine.sfproj", "{A3D9652B-E199-440F-9BBD-47941E674CCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngineActor", "MatchingEngineActor\MatchingEngineActor.csproj", "{7E5ACF0B-B78D-44CB-8D5E-AFB2F8E50D33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.Actor", "MatchingEngine.Actor\MatchingEngine.Actor.csproj", "{7E5ACF0B-B78D-44CB-8D5E-AFB2F8E50D33}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.Utils", "MatchingEngine.Utils\MatchingEngine.Utils.csproj", "{F81DC784-8769-4EA6-893A-3183390469F9}"
 EndProject

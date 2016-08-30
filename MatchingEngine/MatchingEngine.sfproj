@@ -27,7 +27,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MatchingEngineActor\MatchingEngineActor.csproj" />
+    <ProjectReference Include="..\MatchingEngine.Actor\MatchingEngine.Actor.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>

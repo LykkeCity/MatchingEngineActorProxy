@@ -9,7 +9,7 @@
        should match the Name and Version attributes of the ServiceManifest element defined in the 
        ServiceManifest.xml file. -->
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="MatchingEngineActorPkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="MatchingEngine.ActorPkg" ServiceManifestVersion="1.0.0" />
   </ServiceManifestImport>
   <DefaultServices>
     <Service Name="MatchingEngineActorService" GeneratedIdRef="9b1b254d-05f0-4378-a9c0-48a7eb446aa5|Persisted">
