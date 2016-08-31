@@ -30,7 +30,6 @@ namespace MatchingEngine.Actor
         private readonly IDictionaryService _dictionaryProxy;
         private StatefulServiceContext _context;
         private IActorTimer _updateAssetTimer;
-        private IActorTimer _updateTimer;
 
         public MatchingEngine(StatefulServiceContext context)
         {
@@ -89,26 +88,8 @@ namespace MatchingEngine.Actor
 
             await StateManager.TryAddStateAsync("AssetPairs", assetPairs);
 
-            _updateTimer = RegisterTimer(UpdateAccountBalanceAsync, null, TimeSpan.FromSeconds(3),
-                TimeSpan.FromSeconds(3));
-
-            _updateAssetTimer = RegisterTimer(UpdateAssetPairAsync, null, TimeSpan.FromSeconds(2),
-                TimeSpan.FromSeconds(2));
-        }
-
-        private async Task UpdateAccountBalanceAsync(object obj)
-        {
-            var rnd = new Random();
-
-            var accountInfos = await _accountInfoRepository.GetAllAsync();
-
-            foreach (var account in accountInfos)
-            {
-                account.Balance = rnd.NextDouble()*100;
-
-                var ev = GetEvent<IMatchingEngineEvents>();
-                ev.AccountUpdated(account.AccountId);
-            }
+            _updateAssetTimer = RegisterTimer(UpdateAssetPairAsync, null, TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(10));
         }
 
         private async Task UpdateAssetPairAsync(object obj)
