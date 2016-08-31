@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.DataAccess.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.Actor.Tests", "Tests\MatchingEngine.Actor.Tests\MatchingEngine.Actor.Tests.csproj", "{E7F1B1FE-0706-416E-8350-EC28616DB687}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.BusinessService", "MatchingEngine.BusinessService\MatchingEngine.BusinessService.csproj", "{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Release|x64.ActiveCfg = Release|Any CPU
 		{E7F1B1FE-0706-416E-8350-EC28616DB687}.Release|x64.Build.0 = Release|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Debug|x64.Build.0 = Debug|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Release|x64.ActiveCfg = Release|Any CPU
+		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

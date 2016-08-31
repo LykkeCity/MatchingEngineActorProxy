@@ -7,11 +7,10 @@ using Lykke.Core.Domain.Account;
 using Lykke.Core.Domain.Account.Models;
 using Lykke.Core.Domain.Assets;
 using Lykke.Core.Domain.Assets.Models;
-using Lykke.Core.Domain.Dictionary;
 using Lykke.Core.Domain.Exchange;
 using Lykke.Core.Domain.Exchange.Models;
 using Lykke.Core.Domain.MatchingEngine;
-using MatchingEngine.Actor.Proxy;
+using MatchingEngine.BusinessService.Proxy;
 using MatchingEngine.DataAccess.Account;
 using MatchingEngine.DataAccess.Asset;
 using MatchingEngine.DataAccess.Exchange;
@@ -27,14 +26,14 @@ namespace MatchingEngine.Actor
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;
         private readonly IOrderInfoRepository _orderInfoRepository;
         private readonly ITransactionHistoryRepository _transactionHistoryRepository;
-        private readonly IDictionaryService _dictionaryProxy;
+        private readonly IDictionaryProxy _dictionaryProxy;
         private StatefulServiceContext _context;
         private IActorTimer _updateAssetTimer;
 
         public MatchingEngine(StatefulServiceContext context)
         {
             _context = context;
-            _dictionaryProxy = new DictionaryProxy().Connect(context);
+            _dictionaryProxy = new DictionaryProxy();
 
             //TODO: refactor
             _accountInfoRepository = new AccountInfoRepository();

@@ -3,41 +3,33 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
-    <ProjectGuid>{7E5ACF0B-B78D-44CB-8D5E-AFB2F8E50D33}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MatchingEngine.Actor</RootNamespace>
-    <AssemblyName>MatchingEngine.Actor</AssemblyName>
+    <RootNamespace>MatchingEngine.BusinessService</RootNamespace>
+    <AssemblyName>MatchingEngine.BusinessService</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup>
-    <UpdateServiceFabricManifestEnabled>true</UpdateServiceFabricManifestEnabled>
-    <ServicePackagePath>PackageRoot</ServicePackagePath>
-    <ServicePackagePrefix>$(MSBuildProjectName)</ServicePackagePrefix>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\x64\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <PlatformTarget>x64</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\x64\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <PlatformTarget>x64</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Lykke.Core.Domain, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
@@ -79,34 +71,21 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MatchingEngine.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="ActorEventSource.cs" />
+    <Compile Include="Proxy\DictionaryProxy.cs" />
+    <Compile Include="Proxy\IDictionaryProxy.cs" />
+    <Compile Include="Proxy\IProxy.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PackageRoot\ServiceManifest.xml" />
-    <None Include="PackageRoot\Config\Settings.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MatchingEngine.BusinessService\MatchingEngine.BusinessService.csproj">
-      <Project>{bec2d6f8-9a2f-41fc-b437-d222b55deee6}</Project>
-      <Name>MatchingEngine.BusinessService</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MatchingEngine.DataAccess\MatchingEngine.DataAccess.csproj">
-      <Project>{D104E6E7-A088-451C-8943-BF9E05198EA3}</Project>
-      <Name>MatchingEngine.DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MatchingEngine.Utils\MatchingEngine.Utils.csproj">
-      <Project>{F81DC784-8769-4EA6-893A-3183390469F9}</Project>
-      <Name>MatchingEngine.Utils</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets')" />
@@ -116,4 +95,11 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ServiceFabric.Actors.2.1.163\build\Microsoft.ServiceFabric.Actors.targets'))" />
   </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>
