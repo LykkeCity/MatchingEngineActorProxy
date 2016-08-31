@@ -7,5 +7,7 @@ namespace MatchingEngine.BusinessService.Proxy
     public interface IDictionaryProxy : IProxy
     {
         Task<IEnumerable<AssetPair>> GetAssetPairsAsync();
+
+        Task<AssetPair> GetAssetPairAsync(string baseAssetId, string quotingAssetId);
     }
 }

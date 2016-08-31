@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Core.Domain.Assets.Models;
 using Lykke.Core.Domain.Dictionary;
@@ -11,6 +12,7 @@ namespace MatchingEngine.BusinessService.Proxy
     public class DictionaryProxy : IDictionaryProxy
     {
         private static IDictionaryService _actorProxy;
+        private static IEnumerable<AssetPair> _assetPairs = new List<AssetPair>();
 
         public DictionaryProxy()
         {
@@ -21,7 +23,16 @@ namespace MatchingEngine.BusinessService.Proxy
 
         public async Task<IEnumerable<AssetPair>> GetAssetPairsAsync()
         {
-            return await _actorProxy.GetAssetPairsAsync();
+            return _assetPairs ?? (_assetPairs = await _actorProxy.GetAssetPairsAsync());
+        }
+
+        public async Task<AssetPair> GetAssetPairAsync(string baseAssetId, string quotingAssetId)
+        {
+            if (!_assetPairs.Any())
+                await GetAssetPairsAsync();
+
+            return
+                _assetPairs.FirstOrDefault(a => (a.BaseAssetId == baseAssetId) && (a.QuotingAssetId == quotingAssetId));
         }
     }
 }
