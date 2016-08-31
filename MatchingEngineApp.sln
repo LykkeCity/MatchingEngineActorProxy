@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.Actor.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.BusinessService", "MatchingEngine.BusinessService\MatchingEngine.BusinessService.csproj", "{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchingEngine.BusinessService.Tests", "Tests\MatchingEngine.BusinessService.Tests\MatchingEngine.BusinessService.Tests.csproj", "{7F486E99-93FF-43AF-9B06-45E6F24F1606}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Release|x64.ActiveCfg = Release|Any CPU
 		{BEC2D6F8-9A2F-41FC-B437-D222B55DEEE6}.Release|x64.Build.0 = Release|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Debug|x64.Build.0 = Debug|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,5 +98,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{45EC8BA5-1D1C-4035-B46C-3DCAA1FE75CD} = {6B05F528-A164-4D22-A0B1-D681FD5F120C}
 		{E7F1B1FE-0706-416E-8350-EC28616DB687} = {6B05F528-A164-4D22-A0B1-D681FD5F120C}
+		{7F486E99-93FF-43AF-9B06-45E6F24F1606} = {6B05F528-A164-4D22-A0B1-D681FD5F120C}
 	EndGlobalSection
 EndGlobal
