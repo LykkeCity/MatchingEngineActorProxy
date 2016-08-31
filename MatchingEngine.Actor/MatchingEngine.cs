@@ -63,7 +63,16 @@ namespace MatchingEngine.Actor
 
             var quote = await _assetPairQuoteRepository.GetAsync(activeOrder.AssetPairId);
 
-            await _transactionHistoryRepository.AddAsync(activeOrder, quote);
+            var transactionHistory = new TransactionHistory
+            {
+                AccountId = activeOrder.ClientId,
+                AssetPairId = activeOrder.AssetPairId,
+                CompletedAt = DateTime.UtcNow,
+                TransactionId = activeOrder.Id,
+                Price = activeOrder.OrderAction == OrderAction.Buy ? quote.Ask : quote.Bid
+            };
+
+            await _transactionHistoryRepository.AddAsync(transactionHistory);
 
             await _orderInfoRepository.DeleteAsync(accountId, orderId);
         }
