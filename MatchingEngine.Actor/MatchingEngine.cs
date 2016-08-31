@@ -10,6 +10,7 @@ using Lykke.Core.Domain.Assets.Models;
 using Lykke.Core.Domain.Exchange;
 using Lykke.Core.Domain.Exchange.Models;
 using Lykke.Core.Domain.MatchingEngine;
+using MatchingEngine.BusinessService.Exchange;
 using MatchingEngine.BusinessService.Proxy;
 using MatchingEngine.DataAccess.Account;
 using MatchingEngine.DataAccess.Asset;
@@ -24,9 +25,10 @@ namespace MatchingEngine.Actor
     {
         private readonly IAccountInfoRepository _accountInfoRepository;
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;
+        private readonly IDictionaryProxy _dictionaryProxy;
+        private readonly IOrderCalculator _orderCalculator;
         private readonly IOrderInfoRepository _orderInfoRepository;
         private readonly ITransactionHistoryRepository _transactionHistoryRepository;
-        private readonly IDictionaryProxy _dictionaryProxy;
         private StatefulServiceContext _context;
         private IActorTimer _updateAssetTimer;
 
@@ -40,6 +42,7 @@ namespace MatchingEngine.Actor
             _assetPairQuoteRepository = new AssetPairQuoteRepository();
             _orderInfoRepository = new OrderInfoRepository(_assetPairQuoteRepository);
             _transactionHistoryRepository = new TransactionHistoryRepository();
+            _orderCalculator = new OrderCalculator(_assetPairQuoteRepository, _dictionaryProxy);
         }
 
         public Task InitAsync()
@@ -59,7 +62,11 @@ namespace MatchingEngine.Actor
 
         public async Task CloseOrderAsync(string accountId, string orderId)
         {
+            var account = await _accountInfoRepository.GetAsync(accountId);
+
             var activeOrder = await _orderInfoRepository.GetAsync(accountId, orderId);
+
+            var assetPair = await _dictionaryProxy.GetAssetPairByIdAsync(activeOrder.AssetPairId);
 
             var quote = await _assetPairQuoteRepository.GetAsync(activeOrder.AssetPairId);
 
@@ -72,9 +79,21 @@ namespace MatchingEngine.Actor
                 Price = activeOrder.OrderAction == OrderAction.Buy ? quote.Ask : quote.Bid
             };
 
+            var profitLoss =
+                await _orderCalculator.CalculateProfitLossAsync(activeOrder.Price, transactionHistory.Price,
+                    activeOrder.Volume, assetPair, account.BaseAssetId);
+
+            transactionHistory.ProfitLoss = profitLoss;
+
             await _transactionHistoryRepository.AddAsync(transactionHistory);
 
             await _orderInfoRepository.DeleteAsync(accountId, orderId);
+
+            account.Balance += profitLoss;
+            await _accountInfoRepository.UpdateAsync(account);
+
+            var ev = GetEvent<IMatchingEngineEvents>();
+            ev.AccountUpdated(accountId);
         }
 
         public async Task<IEnumerable<OrderInfo>> GetActiveOrdersAsync(string accountId)
