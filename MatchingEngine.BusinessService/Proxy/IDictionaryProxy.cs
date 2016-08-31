@@ -9,5 +9,7 @@ namespace MatchingEngine.BusinessService.Proxy
         Task<IEnumerable<AssetPair>> GetAssetPairsAsync();
 
         Task<AssetPair> GetAssetPairAsync(string baseAssetId, string quotingAssetId);
+
+        Task<AssetPair> GetAssetPairByIdAsync(string assetPairId);
     }
 }

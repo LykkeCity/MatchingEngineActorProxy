@@ -34,5 +34,13 @@ namespace MatchingEngine.BusinessService.Proxy
             return
                 _assetPairs.FirstOrDefault(a => (a.BaseAssetId == baseAssetId) && (a.QuotingAssetId == quotingAssetId));
         }
+
+        public async Task<AssetPair> GetAssetPairByIdAsync(string assetPairId)
+        {
+            if (!_assetPairs.Any())
+                await GetAssetPairsAsync();
+
+            return _assetPairs.FirstOrDefault(a => a.Id == assetPairId);
+        }
     }
 }
