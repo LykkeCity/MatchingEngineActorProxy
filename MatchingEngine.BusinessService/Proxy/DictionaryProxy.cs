@@ -23,7 +23,7 @@ namespace MatchingEngine.BusinessService.Proxy
 
         public async Task<IEnumerable<AssetPair>> GetAssetPairsAsync()
         {
-            return _assetPairs ?? (_assetPairs = await _actorProxy.GetAssetPairsAsync());
+            return _assetPairs.Any() ? _assetPairs : _assetPairs = await _actorProxy.GetAssetPairsAsync();
         }
 
         public async Task<AssetPair> GetAssetPairAsync(string baseAssetId, string quotingAssetId)
