@@ -10,10 +10,12 @@ namespace MatchingEngine.Actor
         {
             try
             {
-                ActorRuntime.RegisterActorAsync<global::MatchingEngine.Actor.MatchingEngine>(
-                        (context, actorType) => new ActorService(context, actorType, () => new global::MatchingEngine.Actor.MatchingEngine(context)))
+                ActorRuntime.RegisterActorAsync<MatchingEngine>(
+                        (context, actorType) => new ActorService(context, actorType, () => new MatchingEngine(context)))
                     .GetAwaiter()
                     .GetResult();
+
+                MappingConfig.Configure();
 
                 Thread.Sleep(Timeout.Infinite);
             }

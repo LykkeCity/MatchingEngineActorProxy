@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Lykke.Core.Domain.Account;
 using Lykke.Core.Domain.Account.Models;
 using Lykke.Core.Domain.Assets;
@@ -26,8 +27,9 @@ namespace MatchingEngine.Actor
         private readonly IAccountInfoRepository _accountInfoRepository;
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;
         private readonly IDictionaryProxy _dictionaryProxy;
+        private readonly IMarketOrderRepository _marketOrderRepository;
         private readonly IOrderCalculator _orderCalculator;
-        private readonly IOrderInfoRepository _orderInfoRepository;
+        private readonly IPendingOrderRepository _pendingOrderRepository;
         private readonly ITransactionHistoryRepository _transactionHistoryRepository;
         private StatefulServiceContext _context;
         private IActorTimer _updateAssetTimer;
@@ -40,7 +42,8 @@ namespace MatchingEngine.Actor
             //TODO: refactor
             _accountInfoRepository = new AccountInfoRepository();
             _assetPairQuoteRepository = new AssetPairQuoteRepository();
-            _orderInfoRepository = new OrderInfoRepository(_assetPairQuoteRepository);
+            _marketOrderRepository = new MarketOrderRepository(_assetPairQuoteRepository);
+            _pendingOrderRepository = new PendingOrderRepository();
             _transactionHistoryRepository = new TransactionHistoryRepository();
             _orderCalculator = new OrderCalculator(_assetPairQuoteRepository, _dictionaryProxy);
         }
@@ -55,16 +58,19 @@ namespace MatchingEngine.Actor
             return _accountInfoRepository.GetAsync(accountId);
         }
 
-        public async Task OpenOrderAsync(string accountId, string assetPairId, double volume)
+        public async Task OpenOrderAsync(string accountId, string assetPairId, double volume, double definedPrice)
         {
-            await _orderInfoRepository.AddAsync(accountId, assetPairId, volume);
+            if (!double.IsNaN(definedPrice))
+                await _pendingOrderRepository.AddAsync(accountId, assetPairId, volume, definedPrice);
+            else
+                await _marketOrderRepository.AddAsync(accountId, assetPairId, volume);
         }
 
         public async Task CloseOrderAsync(string accountId, string orderId)
         {
             var account = await _accountInfoRepository.GetAsync(accountId);
 
-            var activeOrder = await _orderInfoRepository.GetAsync(accountId, orderId);
+            var activeOrder = await _marketOrderRepository.GetAsync(accountId, orderId);
 
             var assetPair = await _dictionaryProxy.GetAssetPairByIdAsync(activeOrder.AssetPairId);
 
@@ -87,7 +93,7 @@ namespace MatchingEngine.Actor
 
             await _transactionHistoryRepository.AddAsync(transactionHistory);
 
-            await _orderInfoRepository.DeleteAsync(accountId, orderId);
+            await _marketOrderRepository.DeleteAsync(accountId, orderId);
 
             account.Balance += profitLoss;
             await _accountInfoRepository.UpdateAsync(account);
@@ -98,10 +104,15 @@ namespace MatchingEngine.Actor
 
         public async Task<IEnumerable<OrderInfo>> GetActiveOrdersAsync(string accountId)
         {
-            return await _orderInfoRepository.GetAllAsync(accountId);
+            var marketOrder = await _marketOrderRepository.GetAllAsync(accountId);
+            var pendingOrders = await _pendingOrderRepository.GetAllAsync(accountId);
+            var orderInfo =
+                marketOrder.Select(Mapper.Map<OrderInfo>).Union<OrderInfo>(pendingOrders.Select(Mapper.Map<OrderInfo>));
+
+            return orderInfo;
         }
 
-        public async Task<IEnumerable<AssetPairQuote>> GetMarketProfile()
+        public async Task<IEnumerable<AssetPairQuote>> GetMarketProfileAsync()
         {
             return await _assetPairQuoteRepository.GetAllAsync();
         }
@@ -123,16 +134,70 @@ namespace MatchingEngine.Actor
         {
             var assetPairs = (await StateManager.GetStateAsync<IEnumerable<AssetPair>>("AssetPairs")).ToList();
 
+            var pendingOrders = (await _pendingOrderRepository.GetAllAsync(null)).ToList();
+
             var rnd = new Random();
 
             var assetId = rnd.Next(assetPairs.Count);
 
             var assetPair = assetPairs[assetId];
 
-            var updatedQuote = await _assetPairQuoteRepository.UpdateAsync(assetPair);
+            AssetPairQuote updatedQuote;
+
+            if (pendingOrders.Any())
+            {
+                var assetPairIds = pendingOrders.Select(p => p.AssetPairId).Distinct().ToList();
+                assetPairIds.Add(assetPair.Id);
+
+                assetId = rnd.Next(assetPairIds.Count);
+
+                var pendingOrder = pendingOrders.First(p => p.AssetPairId.Equals(assetPairIds[assetId]));
+                var assetPairQuote = new AssetPairQuote
+                {
+                    AssetPairId = pendingOrder.AssetPairId
+                };
+                if (pendingOrder.OrderAction == OrderAction.Buy)
+                {
+                    assetPairQuote.Bid = pendingOrder.DefinedPrice - rnd.NextDouble();
+                    assetPairQuote.Ask = assetPairQuote.Bid + rnd.NextDouble();
+                }
+                else
+                {
+                    assetPairQuote.Ask = pendingOrder.DefinedPrice + rnd.NextDouble();
+                    assetPairQuote.Bid = assetPairQuote.Bid - rnd.NextDouble();
+                }
+
+                updatedQuote = await _assetPairQuoteRepository.UpdateAsync(assetPairQuote);
+            }
+            else
+            {
+                updatedQuote = await _assetPairQuoteRepository.UpdateAsync(assetPair);
+            }
 
             var ev = GetEvent<IMatchingEngineEvents>();
             ev.AssetPairPriceUpdated(updatedQuote);
+
+            await UpdatePendingOrdersAsync(updatedQuote);
+        }
+
+        private async Task UpdatePendingOrdersAsync(AssetPairQuote updatedQuote)
+        {
+            var pendingOrders =
+                (await _pendingOrderRepository.FindByAssetPairIdAsync(updatedQuote.AssetPairId)).ToList();
+
+            foreach (var pendingOrder in pendingOrders)
+                if (((pendingOrder.OrderAction == OrderAction.Buy) && (pendingOrder.DefinedPrice >= updatedQuote.Bid)) ||
+                    ((pendingOrder.OrderAction == OrderAction.Sell) && (pendingOrder.DefinedPrice <= updatedQuote.Ask)))
+                {
+                    await
+                        _marketOrderRepository.AddAsync(pendingOrder.ClientId, pendingOrder.AssetPairId,
+                            pendingOrder.Volume);
+
+                    await _pendingOrderRepository.DeleteAsync(pendingOrder.ClientId, pendingOrder.Id);
+
+                    var ev = GetEvent<IMatchingEngineEvents>();
+                    ev.ActiveOrdersUpdated(pendingOrder.ClientId);
+                }
         }
     }
 }

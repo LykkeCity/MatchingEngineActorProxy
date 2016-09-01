@@ -69,5 +69,18 @@ namespace MatchingEngine.DataAccess.Asset
 
             return Task.FromResult(order);
         }
+
+        public Task<AssetPairQuote> UpdateAsync(AssetPairQuote assetPairQuote)
+        {
+            var order = _orders.FirstOrDefault(o => o.AssetPairId == assetPairQuote.AssetPairId);
+
+            if (order == null)
+                throw new InvalidOperationException();
+
+            order = assetPairQuote;
+            order.DateTime = DateTime.UtcNow;
+
+            return Task.FromResult(order);
+        }
     }
 }

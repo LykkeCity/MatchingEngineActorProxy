@@ -9,12 +9,14 @@ using MatchingEngine.Utils.Extensions;
 
 namespace MatchingEngine.DataAccess.Exchange
 {
-    public class OrderInfoRepository : IOrderInfoRepository
+    public class MarketOrderRepository : IMarketOrderRepository
     {
-        private static readonly Dictionary<string, List<OrderInfo>> _orders = new Dictionary<string, List<OrderInfo>>();
+        private static readonly Dictionary<string, List<MarketOrder>> _orders =
+            new Dictionary<string, List<MarketOrder>>();
+
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;
 
-        public OrderInfoRepository(IAssetPairQuoteRepository assetPairQuoteRepository)
+        public MarketOrderRepository(IAssetPairQuoteRepository assetPairQuoteRepository)
         {
             _assetPairQuoteRepository = assetPairQuoteRepository;
         }
@@ -26,7 +28,7 @@ namespace MatchingEngine.DataAccess.Exchange
             if (currentQuote == null)
                 throw new InvalidOperationException();
 
-            var orderInfo = new OrderInfo
+            var orderInfo = new MarketOrder
             {
                 ClientId = accountId,
                 AssetPairId = assetPairId,
@@ -38,34 +40,30 @@ namespace MatchingEngine.DataAccess.Exchange
             orderInfo.Price = orderInfo.OrderAction == OrderAction.Buy ? currentQuote.Ask : currentQuote.Bid;
 
             if (_orders.ContainsKey(accountId))
-            {
                 _orders[accountId].Add(orderInfo);
-            }
             else
-            {
-                _orders.Add(accountId, new List<OrderInfo> {orderInfo});
-            }
+                _orders.Add(accountId, new List<MarketOrder> {orderInfo});
         }
 
-        public Task<IEnumerable<OrderInfo>> GetAllAsync(string accountId)
+        public Task<IEnumerable<MarketOrder>> GetAllAsync(string accountId)
         {
             if (_orders.Count == 0)
-                return TaskEx.Null<IEnumerable<OrderInfo>>();
+                return TaskEx.Null<IEnumerable<MarketOrder>>();
 
-            IEnumerable<OrderInfo> accountOrders = _orders[accountId];
+            IEnumerable<MarketOrder> accountOrders = _orders[accountId];
 
             return Task.FromResult(accountOrders);
         }
 
-        public Task<OrderInfo> GetAsync(string accountId, string orderId)
+        public Task<MarketOrder> GetAsync(string accountId, string orderId)
         {
-            if(_orders.Count == 0)
+            if (_orders.Count == 0)
                 throw new InvalidOperationException("no orders exist");
 
-            if(!_orders.ContainsKey(accountId))
+            if (!_orders.ContainsKey(accountId))
                 throw new InvalidOperationException("account doesn't have any order");
 
-            if(_orders[accountId].All(o => o.Id != orderId))
+            if (_orders[accountId].All(o => o.Id != orderId))
                 throw new InvalidOperationException("invalid order");
 
             return Task.FromResult(_orders[accountId].FirstOrDefault(o => o.Id == orderId));
@@ -78,9 +76,7 @@ namespace MatchingEngine.DataAccess.Exchange
             _orders[accountId].Remove(order);
 
             if (_orders[accountId] == null)
-            {
                 _orders.Remove(accountId);
-            }
         }
     }
 }
