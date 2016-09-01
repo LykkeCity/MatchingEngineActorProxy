@@ -13,9 +13,6 @@ using Lykke.Core.Domain.Exchange.Models;
 using Lykke.Core.Domain.MatchingEngine;
 using MatchingEngine.BusinessService.Exchange;
 using MatchingEngine.BusinessService.Proxy;
-using MatchingEngine.DataAccess.Account;
-using MatchingEngine.DataAccess.Asset;
-using MatchingEngine.DataAccess.Exchange;
 using MatchingEngine.Utils.Extensions;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
@@ -31,21 +28,20 @@ namespace MatchingEngine.Actor
         private readonly IOrderCalculator _orderCalculator;
         private readonly IPendingOrderRepository _pendingOrderRepository;
         private readonly ITransactionHistoryRepository _transactionHistoryRepository;
-        private StatefulServiceContext _context;
         private IActorTimer _updateAssetTimer;
 
-        public MatchingEngine(StatefulServiceContext context)
+        public MatchingEngine(IDictionaryProxy dictionaryProxy,
+            IAccountInfoRepository accountInfoRepository, IAssetPairQuoteRepository assetPairQuoteRepository,
+            IMarketOrderRepository marketOrderRepository, IPendingOrderRepository pendingOrderRepository,
+            ITransactionHistoryRepository transactionHistoryRepository, IOrderCalculator orderCalculator)
         {
-            _context = context;
-            _dictionaryProxy = new DictionaryProxy();
-
-            //TODO: refactor
-            _accountInfoRepository = new AccountInfoRepository();
-            _assetPairQuoteRepository = new AssetPairQuoteRepository();
-            _marketOrderRepository = new MarketOrderRepository(_assetPairQuoteRepository);
-            _pendingOrderRepository = new PendingOrderRepository();
-            _transactionHistoryRepository = new TransactionHistoryRepository();
-            _orderCalculator = new OrderCalculator(_assetPairQuoteRepository, _dictionaryProxy);
+            _dictionaryProxy = dictionaryProxy;
+            _accountInfoRepository = accountInfoRepository;
+            _assetPairQuoteRepository = assetPairQuoteRepository;
+            _marketOrderRepository = marketOrderRepository;
+            _pendingOrderRepository = pendingOrderRepository;
+            _transactionHistoryRepository = transactionHistoryRepository;
+            _orderCalculator = orderCalculator;
         }
 
         public Task InitAsync()
