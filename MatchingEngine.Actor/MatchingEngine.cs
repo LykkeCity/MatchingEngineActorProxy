@@ -100,10 +100,10 @@ namespace MatchingEngine.Actor
 
         public async Task<IEnumerable<OrderInfo>> GetActiveOrdersAsync(string accountId)
         {
-            var marketOrder = await _marketOrderRepository.GetAllAsync(accountId);
-            var pendingOrders = await _pendingOrderRepository.GetAllAsync(accountId);
+            var marketOrder = await _marketOrderRepository.GetAllAsync(accountId) ?? new List<MarketOrder>();
+            var pendingOrders = await _pendingOrderRepository.GetAllAsync(accountId) ?? new List<PendingOrder>();
             var orderInfo =
-                marketOrder.Select(Mapper.Map<OrderInfo>).Union<OrderInfo>(pendingOrders.Select(Mapper.Map<OrderInfo>));
+                marketOrder.Select(Mapper.Map<OrderInfo>).Union(pendingOrders.Select(Mapper.Map<OrderInfo>));
 
             return orderInfo;
         }
