@@ -130,7 +130,7 @@ namespace MatchingEngine.Actor
         {
             var assetPairs = (await StateManager.GetStateAsync<IEnumerable<AssetPair>>("AssetPairs")).ToList();
 
-            var pendingOrders = (await _pendingOrderRepository.GetAllAsync(null)).ToList();
+            var pendingOrders = await _pendingOrderRepository.GetAllAsync(null);
 
             var rnd = new Random();
 
@@ -140,14 +140,15 @@ namespace MatchingEngine.Actor
 
             AssetPairQuote updatedQuote;
 
-            if (pendingOrders.Any())
+            if (pendingOrders != null)
             {
-                var assetPairIds = pendingOrders.Select(p => p.AssetPairId).Distinct().ToList();
+                var orders = pendingOrders as IList<PendingOrder> ?? pendingOrders.ToList();
+                var assetPairIds = orders.Select(p => p.AssetPairId).Distinct().ToList();
                 assetPairIds.Add(assetPair.Id);
 
                 assetId = rnd.Next(assetPairIds.Count);
 
-                var pendingOrder = pendingOrders.First(p => p.AssetPairId.Equals(assetPairIds[assetId]));
+                var pendingOrder = orders.First(p => p.AssetPairId.Equals(assetPairIds[assetId]));
                 var assetPairQuote = new AssetPairQuote
                 {
                     AssetPairId = pendingOrder.AssetPairId
@@ -173,7 +174,8 @@ namespace MatchingEngine.Actor
             var ev = GetEvent<IMatchingEngineEvents>();
             ev.AssetPairPriceUpdated(updatedQuote);
 
-            await UpdatePendingOrdersAsync(updatedQuote);
+            if (pendingOrders != null)
+                await UpdatePendingOrdersAsync(updatedQuote);
         }
 
         private async Task UpdatePendingOrdersAsync(AssetPairQuote updatedQuote)
