@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -11,15 +10,17 @@ using Lykke.Core.Domain.Assets.Models;
 using Lykke.Core.Domain.Exchange;
 using Lykke.Core.Domain.Exchange.Models;
 using Lykke.Core.Domain.MatchingEngine;
+using MatchingEngine.Actor.Events;
 using MatchingEngine.BusinessService.Exchange;
 using MatchingEngine.BusinessService.Proxy;
 using MatchingEngine.Utils.Extensions;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace MatchingEngine.Actor
 {
     [StatePersistence(StatePersistence.Persisted)]
-    internal class MatchingEngine : Microsoft.ServiceFabric.Actors.Runtime.Actor, IMatchingEngine
+    internal class MatchingEngine : Microsoft.ServiceFabric.Actors.Runtime.Actor, IEventSubscriber, IMatchingEngine
     {
         private readonly IAccountInfoRepository _accountInfoRepository;
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;
@@ -27,13 +28,15 @@ namespace MatchingEngine.Actor
         private readonly IMarketOrderRepository _marketOrderRepository;
         private readonly IOrderCalculator _orderCalculator;
         private readonly IPendingOrderRepository _pendingOrderRepository;
+        private readonly IEventSubscriber _subscriber;
         private readonly ITransactionHistoryRepository _transactionHistoryRepository;
         private IActorTimer _updateAssetTimer;
 
         public MatchingEngine(IDictionaryProxy dictionaryProxy,
             IAccountInfoRepository accountInfoRepository, IAssetPairQuoteRepository assetPairQuoteRepository,
             IMarketOrderRepository marketOrderRepository, IPendingOrderRepository pendingOrderRepository,
-            ITransactionHistoryRepository transactionHistoryRepository, IOrderCalculator orderCalculator)
+            ITransactionHistoryRepository transactionHistoryRepository, IOrderCalculator orderCalculator,
+            IEventSubscriber subscriber)
         {
             _dictionaryProxy = dictionaryProxy;
             _accountInfoRepository = accountInfoRepository;
@@ -42,6 +45,7 @@ namespace MatchingEngine.Actor
             _pendingOrderRepository = pendingOrderRepository;
             _transactionHistoryRepository = transactionHistoryRepository;
             _orderCalculator = orderCalculator;
+            _subscriber = subscriber;
         }
 
         public Task InitAsync()
@@ -49,9 +53,9 @@ namespace MatchingEngine.Actor
             return TaskEx.Empty;
         }
 
-        public Task<AccountInfo> GetAccountInfoAsync(string accountId)
+        public async Task<AccountInfo> GetAccountInfoAsync(string accountId)
         {
-            return _accountInfoRepository.GetAsync(accountId);
+            return await _accountInfoRepository.GetAsync(accountId);
         }
 
         public async Task OpenOrderAsync(string accountId, string assetPairId, double volume, double definedPrice)
@@ -94,8 +98,16 @@ namespace MatchingEngine.Actor
             account.Balance += profitLoss;
             await _accountInfoRepository.UpdateAsync(account);
 
-            var ev = GetEvent<IMatchingEngineEvents>();
-            ev.AccountUpdated(accountId);
+            //todo: move this to separate method if it's possible to pass interface method in parameters
+            foreach (var subscribers in GetActiveSubsribers())
+                try
+                {
+                    await subscribers.Value.OnAccountUpdated(accountId);
+                }
+                catch (Exception)
+                {
+                    _subscriber.Unsubscribe(subscribers);
+                }
         }
 
         public async Task<IEnumerable<OrderInfo>> GetActiveOrdersAsync(string accountId)
@@ -103,7 +115,7 @@ namespace MatchingEngine.Actor
             var marketOrder = await _marketOrderRepository.GetAllAsync(accountId) ?? new List<MarketOrder>();
             var pendingOrders = await _pendingOrderRepository.GetAllAsync(accountId) ?? new List<PendingOrder>();
             var orderInfo =
-                marketOrder.Select(Mapper.Map<OrderInfo>).Union(pendingOrders.Select(Mapper.Map<OrderInfo>));
+                marketOrder.Select(Mapper.Map<OrderInfo>).Union<OrderInfo>(pendingOrders.Select(Mapper.Map<OrderInfo>));
 
             return orderInfo;
         }
@@ -171,8 +183,15 @@ namespace MatchingEngine.Actor
                 updatedQuote = await _assetPairQuoteRepository.UpdateAsync(assetPair);
             }
 
-            var ev = GetEvent<IMatchingEngineEvents>();
-            ev.AssetPairPriceUpdated(updatedQuote);
+            foreach (var subscribers in GetActiveSubsribers())
+                try
+                {
+                    await subscribers.Value.OnAssetPairPriceUpdated(updatedQuote);
+                }
+                catch (Exception)
+                {
+                    _subscriber.Unsubscribe(subscribers);
+                }
 
             if (pendingOrders != null)
                 await UpdatePendingOrdersAsync(updatedQuote);
@@ -193,9 +212,35 @@ namespace MatchingEngine.Actor
 
                     await _pendingOrderRepository.DeleteAsync(pendingOrder.ClientId, pendingOrder.Id);
 
-                    var ev = GetEvent<IMatchingEngineEvents>();
-                    ev.ActiveOrdersUpdated(pendingOrder.ClientId);
+                    foreach (var subscribers in GetActiveSubsribers())
+                        try
+                        {
+                            await subscribers.Value.OnActiveOrdersUpdated(pendingOrder.ClientId);
+                        }
+                        catch (Exception)
+                        {
+                            _subscriber.Unsubscribe(subscribers);
+                        }
                 }
         }
+
+        #region IEventSubscriber implementation
+
+        public async Task SubscribeAsync(IMatchingEngineEventSubscriber events)
+        {
+            await _subscriber.SubscribeAsync(events);
+        }
+
+        public Dictionary<ActorId, IMatchingEngineEventSubscriber> GetActiveSubsribers()
+        {
+            return _subscriber.GetActiveSubsribers();
+        }
+
+        public void Unsubscribe(KeyValuePair<ActorId, IMatchingEngineEventSubscriber> subscriber)
+        {
+            _subscriber.Unsubscribe(subscriber);
+        }
+
+        #endregion
     }
 }

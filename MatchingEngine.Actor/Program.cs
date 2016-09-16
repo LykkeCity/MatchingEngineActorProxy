@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using MatchingEngine.Actor.Events;
 using MatchingEngine.BusinessService.Exchange;
 using MatchingEngine.BusinessService.Proxy;
 using MatchingEngine.DataAccess.Account;
@@ -24,7 +25,7 @@ namespace MatchingEngine.Actor
                             return new MatchingEngine(dictionaryProxy, new AccountInfoRepository(),
                                 assetPairQuoteRepository, new MarketOrderRepository(assetPairQuoteRepository),
                                 new PendingOrderRepository(), new TransactionHistoryRepository(),
-                                new OrderCalculator(assetPairQuoteRepository, dictionaryProxy));
+                                new OrderCalculator(assetPairQuoteRepository, dictionaryProxy), new EventSubscriber());
                         }))
                     .GetAwaiter()
                     .GetResult();
