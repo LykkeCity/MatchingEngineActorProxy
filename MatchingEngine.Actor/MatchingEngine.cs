@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -11,9 +10,11 @@ using Lykke.Core.Domain.Assets.Models;
 using Lykke.Core.Domain.Exchange;
 using Lykke.Core.Domain.Exchange.Models;
 using Lykke.Core.Domain.MatchingEngine;
+using MatchingEngine.BusinessService.Events;
 using MatchingEngine.BusinessService.Exchange;
 using MatchingEngine.BusinessService.Proxy;
 using MatchingEngine.Utils.Extensions;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace MatchingEngine.Actor
@@ -25,6 +26,7 @@ namespace MatchingEngine.Actor
         private readonly IAssetPairQuoteRepository _assetPairQuoteRepository;
         private readonly IDictionaryProxy _dictionaryProxy;
         private readonly IMarketOrderRepository _marketOrderRepository;
+        private readonly IMatchingEngineEventSubscriber _matchingEngineEventSubscriber;
         private readonly IOrderCalculator _orderCalculator;
         private readonly IPendingOrderRepository _pendingOrderRepository;
         private readonly ITransactionHistoryRepository _transactionHistoryRepository;
@@ -33,7 +35,8 @@ namespace MatchingEngine.Actor
         public MatchingEngine(IDictionaryProxy dictionaryProxy,
             IAccountInfoRepository accountInfoRepository, IAssetPairQuoteRepository assetPairQuoteRepository,
             IMarketOrderRepository marketOrderRepository, IPendingOrderRepository pendingOrderRepository,
-            ITransactionHistoryRepository transactionHistoryRepository, IOrderCalculator orderCalculator)
+            ITransactionHistoryRepository transactionHistoryRepository, IOrderCalculator orderCalculator,
+            IMatchingEngineEventSubscriber matchingEngineEventSubscriber)
         {
             _dictionaryProxy = dictionaryProxy;
             _accountInfoRepository = accountInfoRepository;
@@ -42,11 +45,17 @@ namespace MatchingEngine.Actor
             _pendingOrderRepository = pendingOrderRepository;
             _transactionHistoryRepository = transactionHistoryRepository;
             _orderCalculator = orderCalculator;
+            _matchingEngineEventSubscriber = matchingEngineEventSubscriber;
         }
 
         public Task InitAsync()
         {
             return TaskEx.Empty;
+        }
+
+        public async Task SubscribeAsync(string subscriberName)
+        {
+            await _matchingEngineEventSubscriber.SubscribeAsync(subscriberName);
         }
 
         public Task<AccountInfo> GetAccountInfoAsync(string accountId)
@@ -94,8 +103,7 @@ namespace MatchingEngine.Actor
             account.Balance += profitLoss;
             await _accountInfoRepository.UpdateAsync(account);
 
-            var ev = GetEvent<IMatchingEngineEvents>();
-            ev.AccountUpdated(accountId);
+            await _matchingEngineEventSubscriber.AccountUpdatedAsync(accountId);
         }
 
         public async Task<IEnumerable<OrderInfo>> GetActiveOrdersAsync(string accountId)
@@ -103,7 +111,7 @@ namespace MatchingEngine.Actor
             var marketOrder = await _marketOrderRepository.GetAllAsync(accountId) ?? new List<MarketOrder>();
             var pendingOrders = await _pendingOrderRepository.GetAllAsync(accountId) ?? new List<PendingOrder>();
             var orderInfo =
-                marketOrder.Select(Mapper.Map<OrderInfo>).Union(pendingOrders.Select(Mapper.Map<OrderInfo>));
+                marketOrder.Select(Mapper.Map<OrderInfo>).Union<OrderInfo>(pendingOrders.Select(Mapper.Map<OrderInfo>));
 
             return orderInfo;
         }
@@ -171,8 +179,7 @@ namespace MatchingEngine.Actor
                 updatedQuote = await _assetPairQuoteRepository.UpdateAsync(assetPair);
             }
 
-            var ev = GetEvent<IMatchingEngineEvents>();
-            ev.AssetPairPriceUpdated(updatedQuote);
+            await _matchingEngineEventSubscriber.AssetPairPriceUpdatedAsync(updatedQuote);
 
             if (pendingOrders != null)
                 await UpdatePendingOrdersAsync(updatedQuote);
@@ -193,8 +200,7 @@ namespace MatchingEngine.Actor
 
                     await _pendingOrderRepository.DeleteAsync(pendingOrder.ClientId, pendingOrder.Id);
 
-                    var ev = GetEvent<IMatchingEngineEvents>();
-                    ev.ActiveOrdersUpdated(pendingOrder.ClientId);
+                    await _matchingEngineEventSubscriber.ActiveOrdersUpdatedAsync(pendingOrder.ClientId);
                 }
         }
     }
