@@ -25,7 +25,7 @@ namespace MatchingEngine.Actor
                         (context, actorType) => new ActorService(context, actorType, () =>
                         {
                             var assetPairQuoteRepository = new AssetPairQuoteRepository();
-                            var dictionaryProxy = new DictionaryProxy();
+                            var dictionaryProxy = new DictionaryProxy(settings.Factories);
 
                             return new MatchingEngine(dictionaryProxy, new AccountInfoRepository(),
                                 assetPairQuoteRepository, new MarketOrderRepository(assetPairQuoteRepository),
