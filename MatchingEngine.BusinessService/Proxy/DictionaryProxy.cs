@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Core.Domain.Assets.Models;
 using Lykke.Core.Domain.Dictionary;
+using MatchingEngine.Domain.Settings;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Client;
 
@@ -13,10 +14,12 @@ namespace MatchingEngine.BusinessService.Proxy
     {
         private static IDictionaryService _actorProxy;
         private static IEnumerable<AssetPair> _assetPairs = new List<AssetPair>();
+        private readonly FactorySettings _settings;
 
-        public DictionaryProxy()
+        public DictionaryProxy(FactorySettings settings)
         {
-            var matchingEngineServiceUri = new Uri("fabric:/DictionaryApp/DictionaryServiceActorService");
+            _settings = settings;
+            var matchingEngineServiceUri = new Uri(_settings.DictionaryFactoryUri);
             var actorId = ActorId.CreateRandom();
             _actorProxy = ActorProxy.Create<IDictionaryService>(actorId, matchingEngineServiceUri);
         }
