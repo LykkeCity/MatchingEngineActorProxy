@@ -72,6 +72,10 @@
       <HintPath>..\packages\Microsoft.ServiceFabric.Services.2.1.163\lib\net45\Microsoft.ServiceFabric.Services.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.3.2.1\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ServiceFabricServiceModel, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Actors.2.1.163\lib\net45\ServiceFabricServiceModel.dll</HintPath>
       <Private>True</Private>
@@ -107,6 +111,10 @@
     <ProjectReference Include="..\MatchingEngine.DataAccess\MatchingEngine.DataAccess.csproj">
       <Project>{D104E6E7-A088-451C-8943-BF9E05198EA3}</Project>
       <Name>MatchingEngine.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MatchingEngine.Domain\MatchingEngine.Domain.csproj">
+      <Project>{9b7f1898-494d-4135-acfc-c0d27b89faed}</Project>
+      <Name>MatchingEngine.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\MatchingEngine.Utils\MatchingEngine.Utils.csproj">
       <Project>{F81DC784-8769-4EA6-893A-3183390469F9}</Project>

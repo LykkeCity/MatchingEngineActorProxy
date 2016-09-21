@@ -3,9 +3,12 @@ using System.Threading;
 using MatchingEngine.BusinessService.Events;
 using MatchingEngine.BusinessService.Exchange;
 using MatchingEngine.BusinessService.Proxy;
+using MatchingEngine.DataAccess;
 using MatchingEngine.DataAccess.Account;
 using MatchingEngine.DataAccess.Asset;
 using MatchingEngine.DataAccess.Exchange;
+using MatchingEngine.Domain.Settings;
+using Microsoft.Azure;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace MatchingEngine.Actor
@@ -16,6 +19,8 @@ namespace MatchingEngine.Actor
         {
             try
             {
+                var settings = ReadSettings();
+
                 ActorRuntime.RegisterActorAsync<MatchingEngine>(
                         (context, actorType) => new ActorService(context, actorType, () =>
                         {
@@ -26,7 +31,7 @@ namespace MatchingEngine.Actor
                                 assetPairQuoteRepository, new MarketOrderRepository(assetPairQuoteRepository),
                                 new PendingOrderRepository(), new TransactionHistoryRepository(),
                                 new OrderCalculator(assetPairQuoteRepository, dictionaryProxy),
-                                new MatchingEngineEventSubscriber());
+                                new MatchingEngineEventSubscriber(settings.MatchingEngine));
                         }))
                     .GetAwaiter()
                     .GetResult();
@@ -40,6 +45,17 @@ namespace MatchingEngine.Actor
                 ActorEventSource.Current.ActorHostInitializationFailed(e.ToString());
                 throw;
             }
+        }
+
+        private static BaseSettings ReadSettings()
+        {
+            var connectionString = CloudConfigurationManager.GetSetting("ConnectionString");
+
+            var containerSettingsLocation = CloudConfigurationManager.GetSetting("ContainerSettingsLocation");
+            var containerSettingsKey = CloudConfigurationManager.GetSetting("ContainerSettingsKey");
+
+            var settingsLocations = new Tuple<string, string>(containerSettingsLocation, containerSettingsKey);
+            return GeneralSettingsReader.ReadGeneralSettings<BaseSettings>(connectionString, settingsLocations);
         }
     }
 }

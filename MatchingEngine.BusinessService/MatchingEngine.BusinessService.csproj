@@ -101,6 +101,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MatchingEngine.Domain\MatchingEngine.Domain.csproj">
+      <Project>{9B7F1898-494D-4135-ACFC-C0D27B89FAED}</Project>
+      <Name>MatchingEngine.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MatchingEngine.Utils\MatchingEngine.Utils.csproj">
       <Project>{f81dc784-8769-4ea6-893a-3183390469f9}</Project>
       <Name>MatchingEngine.Utils</Name>

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lykke.Core.Domain.Assets.Models;
 using Lykke.Core.Domain.MatchingEngine;
-using Microsoft.Azure;
+using MatchingEngine.Domain.Settings;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
@@ -12,9 +12,12 @@ namespace MatchingEngine.BusinessService.Events
 {
     public class MatchingEngineEventSubscriber : IMatchingEngineEventSubscriber
     {
-        private static string ConnectionStringForManaging
-            => CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
+        private readonly MatchingOrdersSettings _settings;
 
+        public MatchingEngineEventSubscriber(MatchingOrdersSettings settingsMatchingEngine)
+        {
+            _settings = settingsMatchingEngine;
+        }
 
         public async Task AccountUpdatedAsync(string accountId)
         {
@@ -71,7 +74,7 @@ namespace MatchingEngine.BusinessService.Events
 
         private async Task SendMessageAsync(string topicName, BrokeredMessage message)
         {
-            var topicClient = TopicClient.CreateFromConnectionString(ConnectionStringForManaging, topicName);
+            var topicClient = TopicClient.CreateFromConnectionString(_settings.ServiceBusConnectionString, topicName);
 
             await topicClient.SendAsync(message);
         }
@@ -79,8 +82,9 @@ namespace MatchingEngine.BusinessService.Events
         private async Task CreateTopicSubscriptionAsync(string topicName, string subscriptionName,
             bool requireSessions = false)
         {
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(ConnectionStringForManaging);
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(_settings.ServiceBusConnectionString);
             if (namespaceManager.SubscriptionExists(topicName, subscriptionName))
+            {
                 if (namespaceManager.GetSubscription(topicName, subscriptionName).RequiresSession != requireSessions)
                 {
                     //todo: add to log
@@ -93,6 +97,7 @@ namespace MatchingEngine.BusinessService.Events
                     Console.WriteLine($"Subscription '{subscriptionName}' for Topic '{topicName}' exists.");
                     return;
                 }
+            }
             var description = new SubscriptionDescription(topicName, subscriptionName)
             {
                 RequiresSession = requireSessions
@@ -105,7 +110,7 @@ namespace MatchingEngine.BusinessService.Events
         private async Task DeleteTopicSubscriptionAsync(string topicName, string subscriptionName,
             bool requireSessions = false)
         {
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(ConnectionStringForManaging);
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(_settings.ServiceBusConnectionString);
             if (namespaceManager.SubscriptionExists(topicName, subscriptionName))
             {
                 //todo: add to log
