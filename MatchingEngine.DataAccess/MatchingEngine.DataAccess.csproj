@@ -60,6 +60,10 @@
       <HintPath>..\packages\Microsoft.ServiceFabric.Services.2.1.163\lib\net45\Microsoft.ServiceFabric.Services.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ServiceFabricServiceModel, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Actors.2.1.163\lib\net45\ServiceFabricServiceModel.dll</HintPath>
       <Private>True</Private>
@@ -84,12 +88,18 @@
     <Compile Include="Exchange\MarketOrderRepository.cs" />
     <Compile Include="Exchange\PendingOrderRepository.cs" />
     <Compile Include="Exchange\TransactionHistoryRepository.cs" />
+    <Compile Include="GeneralSettingsReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MatchingEngine.AzureStorage\MatchingEngine.AzureStorage.csproj">
+      <Project>{1e4f0776-64e0-40a9-993b-6eb78f496378}</Project>
+      <Name>MatchingEngine.AzureStorage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MatchingEngine.Utils\MatchingEngine.Utils.csproj">
       <Project>{f81dc784-8769-4ea6-893a-3183390469f9}</Project>
       <Name>MatchingEngine.Utils</Name>
