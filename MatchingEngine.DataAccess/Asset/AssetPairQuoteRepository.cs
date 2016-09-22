@@ -11,18 +11,36 @@ namespace MatchingEngine.DataAccess.Asset
     public class AssetPairQuoteRepository : IAssetPairQuoteRepository
     {
         private static IEnumerable<AssetPairQuote> _orders = new List<AssetPairQuote>();
-        private readonly Random rnd = new Random();
+        private readonly Random _rnd = new Random();
 
         public Task<IEnumerable<AssetPairQuote>> GetAllAsync()
         {
             return Task.FromResult(_orders);
         }
 
-        public Task<AssetPairQuote> GetAsync(string assertPairId)
+        public Task AddAsync(AssetPairQuote entity)
         {
-            var quote = _orders.FirstOrDefault(x => x.AssetPairId == assertPairId);
+            throw new NotImplementedException();
+        }
 
-            return Task.FromResult(quote);
+        public Task UpdateAsync(AssetPairQuote assetPairQuote)
+        {
+            var order = _orders.FirstOrDefault(o => o.AssetPairId == assetPairQuote.AssetPairId);
+
+            if (order == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            order = assetPairQuote;
+            order.DateTime = DateTime.UtcNow;
+
+            return TaskEx.Empty;
+        }
+
+        public Task DeteleAsync(string id)
+        {
+            throw new NotImplementedException();
         }
 
         public Task AddAllAsync(IEnumerable<AssetPair> assetPairs)
@@ -31,8 +49,8 @@ namespace MatchingEngine.DataAccess.Asset
 
             foreach (var assetPair in assetPairs)
             {
-                var ask = rnd.NextDouble()*(3 - 0.1) + 0.1;
-                var bid = ask - rnd.NextDouble();
+                var ask = _rnd.NextDouble()*(3 - 0.1) + 0.1;
+                var bid = ask - _rnd.NextDouble();
 
                 var assetPairQuote = new AssetPairQuote
                 {
@@ -55,13 +73,15 @@ namespace MatchingEngine.DataAccess.Asset
             var order = _orders.FirstOrDefault(o => o.AssetPairId == assetPair.Id);
 
             if (order == null)
+            {
                 throw new InvalidOperationException();
+            }
 
             var significantDigit = Math.Pow(10, -assetPair.Accuracy);
-            var sign = rnd.Next(0, 1) * 2 - 1;
+            var sign = _rnd.Next(0, 1)*2 - 1;
 
-            var ask = order.Ask + sign * significantDigit;
-            var bid = order.Bid + sign * significantDigit;
+            var ask = order.Ask + sign*significantDigit;
+            var bid = order.Bid + sign*significantDigit;
 
             order.DateTime = DateTime.UtcNow;
             order.Ask = ask;
@@ -70,17 +90,11 @@ namespace MatchingEngine.DataAccess.Asset
             return Task.FromResult(order);
         }
 
-        public Task<AssetPairQuote> UpdateAsync(AssetPairQuote assetPairQuote)
+        public Task<AssetPairQuote> GetByIdAsync(string id)
         {
-            var order = _orders.FirstOrDefault(o => o.AssetPairId == assetPairQuote.AssetPairId);
+            var quote = _orders.FirstOrDefault(x => x.AssetPairId == id);
 
-            if (order == null)
-                throw new InvalidOperationException();
-
-            order = assetPairQuote;
-            order.DateTime = DateTime.UtcNow;
-
-            return Task.FromResult(order);
+            return Task.FromResult(quote);
         }
     }
 }

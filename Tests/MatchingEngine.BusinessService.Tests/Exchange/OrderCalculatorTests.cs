@@ -118,9 +118,9 @@ namespace MatchingEngine.BusinessService.Tests.Exchange
                 AssetPairId = "USDJPY",
                 Ask = 1.3333
             };
-            assetPairQuoteRepository.GetAsync(gbpUsd.AssetPairId).Returns(gbpUsd);
-            assetPairQuoteRepository.GetAsync(usdChf.AssetPairId).Returns(usdChf);
-            assetPairQuoteRepository.GetAsync(usdJpy.AssetPairId).Returns(usdJpy);
+            assetPairQuoteRepository.GetByIdAsync(gbpUsd.AssetPairId).Returns(gbpUsd);
+            assetPairQuoteRepository.GetByIdAsync(usdChf.AssetPairId).Returns(usdChf);
+            assetPairQuoteRepository.GetByIdAsync(usdJpy.AssetPairId).Returns(usdJpy);
 
             var dictionaryProxy = Substitute.For<IDictionaryProxy>();
             dictionaryProxy.GetAssetPairAsync("USD", "JPY").Returns(new AssetPair {Id = "USDJPY"});

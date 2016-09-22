@@ -14,7 +14,12 @@ namespace MatchingEngine.DataAccess.Account
         private const string _defaultBaseAssetId = "EUR";
         private static readonly Dictionary<string, AccountInfo> _accounts = new Dictionary<string, AccountInfo>();
 
-        public async Task<AccountInfo> GetAsync(string accountId)
+        public Task DeteleAsync(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<AccountInfo> GetByIdAsync(string accountId)
         {
             if (!_accounts.ContainsKey(accountId))
             {
@@ -33,7 +38,7 @@ namespace MatchingEngine.DataAccess.Account
 
         public async Task UpdateAsync(AccountInfo accountInfo)
         {
-            var currentAccountInfo = await GetAsync(accountInfo.AccountId);
+            var currentAccountInfo = await GetByIdAsync(accountInfo.AccountId);
 
             _accounts[currentAccountInfo.AccountId] = accountInfo;
         }
@@ -52,7 +57,7 @@ namespace MatchingEngine.DataAccess.Account
         {
             if (_accounts.Count == 0)
             {
-                await GetAsync(Guid.NewGuid().ToString());
+                await GetByIdAsync(Guid.NewGuid().ToString());
             }
 
             return _accounts.Values;

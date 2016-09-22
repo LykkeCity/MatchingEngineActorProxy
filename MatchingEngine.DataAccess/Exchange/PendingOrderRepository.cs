@@ -13,11 +13,6 @@ namespace MatchingEngine.DataAccess.Exchange
         private static readonly Dictionary<string, List<PendingOrder>> _orders =
             new Dictionary<string, List<PendingOrder>>();
 
-        public Task AddAsync(string accountId, string assetPairId, double volume)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<IEnumerable<PendingOrder>> GetAllAsync(string accountId)
         {
             if (_orders.Count == 0)
@@ -58,32 +53,27 @@ namespace MatchingEngine.DataAccess.Exchange
                 _orders.Remove(accountId);
         }
 
-        public Task AddAsync(string accountId, string assetPairId, double volume, double definedPrice)
-        {
-            var orderInfo = new PendingOrder
-            {
-                ClientId = accountId,
-                AssetPairId = assetPairId,
-                Volume = volume,
-                Id = Guid.NewGuid().ToString(),
-                CreatedAt = DateTime.UtcNow,
-                DefinedPrice = definedPrice
-            };
-
-            if (_orders.ContainsKey(accountId))
-                _orders[accountId].Add(orderInfo);
-            else
-                _orders.Add(accountId, new List<PendingOrder> {orderInfo});
-
-            return TaskEx.Empty;
-        }
-
         public Task<IEnumerable<PendingOrder>> FindByAssetPairIdAsync(string assetPairId)
         {
             if (_orders.Count == 0)
                 return TaskEx.Null<IEnumerable<PendingOrder>>();
 
             return Task.FromResult(_orders.SelectMany(o => o.Value.Where(x => x.AssetPairId.Equals(assetPairId))));
+        }
+
+        public Task AddAsync(PendingOrder entity)
+        {
+            if (_orders.ContainsKey(entity.ClientId))
+                _orders[entity.ClientId].Add(entity);
+            else
+                _orders.Add(entity.ClientId, new List<PendingOrder> { entity });
+
+            return TaskEx.Empty;
+        }
+
+        public Task UpdateAsync(PendingOrder entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

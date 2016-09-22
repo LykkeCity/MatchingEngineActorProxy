@@ -33,7 +33,7 @@ namespace MatchingEngine.BusinessService.Exchange
 
             if ((assetPair.QuotingAssetId != baseAssetId) && (assetPair.BaseAssetId == baseAssetId))
             {
-                var asset = await _assetPairQuoteRepository.GetAsync(assetPair.Id);
+                var asset = await _assetPairQuoteRepository.GetByIdAsync(assetPair.Id);
 
                 return asset.Ask;
             }
@@ -42,7 +42,7 @@ namespace MatchingEngine.BusinessService.Exchange
 
             if (requiredAssetPair != null)
             {
-                var assetPairQuote = await _assetPairQuoteRepository.GetAsync(requiredAssetPair.Id);
+                var assetPairQuote = await _assetPairQuoteRepository.GetByIdAsync(requiredAssetPair.Id);
 
                 return assetPairQuote.Ask;
             }
@@ -50,7 +50,7 @@ namespace MatchingEngine.BusinessService.Exchange
             {
                 requiredAssetPair = await _dictionaryProxy.GetAssetPairAsync(assetPair.QuotingAssetId, baseAssetId);
 
-                var assetPairQuote = await _assetPairQuoteRepository.GetAsync(requiredAssetPair.Id);
+                var assetPairQuote = await _assetPairQuoteRepository.GetByIdAsync(requiredAssetPair.Id);
 
                 return 1/assetPairQuote.Ask;
             }

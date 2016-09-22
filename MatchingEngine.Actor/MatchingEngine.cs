@@ -14,7 +14,6 @@ using MatchingEngine.BusinessService.Events;
 using MatchingEngine.BusinessService.Exchange;
 using MatchingEngine.BusinessService.Proxy;
 using MatchingEngine.Utils.Extensions;
-using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace MatchingEngine.Actor
@@ -60,26 +59,60 @@ namespace MatchingEngine.Actor
 
         public Task<AccountInfo> GetAccountInfoAsync(string accountId)
         {
-            return _accountInfoRepository.GetAsync(accountId);
+            return _accountInfoRepository.GetByIdAsync(accountId);
         }
 
-        public async Task OpenOrderAsync(string accountId, string assetPairId, double volume, double definedPrice)
+        public async Task<OrderInfo> OpenOrderAsync(string accountId, string assetPairId, double volume, double definedPrice)
         {
             if (!double.IsNaN(definedPrice))
-                await _pendingOrderRepository.AddAsync(accountId, assetPairId, volume, definedPrice);
+            {
+                var orderInfo = new PendingOrder
+                {
+                    ClientId = accountId,
+                    AssetPairId = assetPairId,
+                    Volume = volume,
+                    Id = Guid.NewGuid().ToString(),
+                    CreatedAt = DateTime.UtcNow,
+                    DefinedPrice = definedPrice
+                };
+
+                await _pendingOrderRepository.AddAsync(orderInfo);
+
+                return Mapper.Map<OrderInfo>(orderInfo);
+            }
             else
-                await _marketOrderRepository.AddAsync(accountId, assetPairId, volume);
+            {
+                var currentQuote = await _assetPairQuoteRepository.GetByIdAsync(assetPairId);
+
+                if (currentQuote == null)
+                    throw new InvalidOperationException();
+
+                var orderInfo = new MarketOrder
+                {
+                    ClientId = accountId,
+                    AssetPairId = assetPairId,
+                    Volume = volume,
+                    Id = Guid.NewGuid().ToString(),
+                    CreatedAt = currentQuote.DateTime
+                };
+
+                orderInfo.Price = orderInfo.OrderAction == OrderAction.Buy ? currentQuote.Ask : currentQuote.Bid;
+
+                await _marketOrderRepository.AddAsync(orderInfo);
+
+                return Mapper.Map<OrderInfo>(orderInfo);
+            }
         }
 
         public async Task CloseOrderAsync(string accountId, string orderId)
         {
-            var account = await _accountInfoRepository.GetAsync(accountId);
+            var account = await _accountInfoRepository.GetByIdAsync(accountId);
 
             var activeOrder = await _marketOrderRepository.GetAsync(accountId, orderId);
 
             var assetPair = await _dictionaryProxy.GetAssetPairByIdAsync(activeOrder.AssetPairId);
 
-            var quote = await _assetPairQuoteRepository.GetAsync(activeOrder.AssetPairId);
+            var quote = await _assetPairQuoteRepository.GetByIdAsync(activeOrder.AssetPairId);
 
             var transactionHistory = new TransactionHistory
             {
@@ -119,6 +152,16 @@ namespace MatchingEngine.Actor
         public async Task<IEnumerable<AssetPairQuote>> GetMarketProfileAsync()
         {
             return await _assetPairQuoteRepository.GetAllAsync();
+        }
+
+        public async Task<IEnumerable<OrderBook>> GetOrderBookAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<TransactionHistory>> GetTransactionsHistoryAsync(string accountId)
+        {
+            return await _transactionHistoryRepository.GetAllAsync(accountId);
         }
 
         protected override async Task OnActivateAsync()
@@ -172,7 +215,8 @@ namespace MatchingEngine.Actor
                     assetPairQuote.Bid = assetPairQuote.Bid - rnd.NextDouble();
                 }
 
-                updatedQuote = await _assetPairQuoteRepository.UpdateAsync(assetPairQuote);
+                await _assetPairQuoteRepository.UpdateAsync(assetPairQuote);
+                updatedQuote = await _assetPairQuoteRepository.GetByIdAsync(assetPairQuote.AssetPairId);
             }
             else
             {
@@ -182,7 +226,9 @@ namespace MatchingEngine.Actor
             await _matchingEngineEventSubscriber.AssetPairPriceUpdatedAsync(updatedQuote);
 
             if (pendingOrders != null)
+            {
                 await UpdatePendingOrdersAsync(updatedQuote);
+            }
         }
 
         private async Task UpdatePendingOrdersAsync(AssetPairQuote updatedQuote)
@@ -194,9 +240,24 @@ namespace MatchingEngine.Actor
                 if (((pendingOrder.OrderAction == OrderAction.Buy) && (pendingOrder.DefinedPrice >= updatedQuote.Bid)) ||
                     ((pendingOrder.OrderAction == OrderAction.Sell) && (pendingOrder.DefinedPrice <= updatedQuote.Ask)))
                 {
+                    var currentQuote = await _assetPairQuoteRepository.GetByIdAsync(updatedQuote.AssetPairId);
+
+                    if (currentQuote == null)
+                        throw new InvalidOperationException();
+
+                    var orderInfo = new MarketOrder
+                    {
+                        ClientId = pendingOrder.ClientId,
+                        AssetPairId = pendingOrder.AssetPairId,
+                        Volume = pendingOrder.Volume,
+                        Id = Guid.NewGuid().ToString(),
+                        CreatedAt = currentQuote.DateTime
+                    };
+
+                    orderInfo.Price = orderInfo.OrderAction == OrderAction.Buy ? currentQuote.Ask : currentQuote.Bid;
+
                     await
-                        _marketOrderRepository.AddAsync(pendingOrder.ClientId, pendingOrder.AssetPairId,
-                            pendingOrder.Volume);
+                        _marketOrderRepository.AddAsync(orderInfo);
 
                     await _pendingOrderRepository.DeleteAsync(pendingOrder.ClientId, pendingOrder.Id);
 
