@@ -26,6 +26,7 @@ namespace MatchingEngine.Actor
         private readonly IDictionaryProxy _dictionaryProxy;
         private readonly IMarketOrderRepository _marketOrderRepository;
         private readonly IMatchingEngineEventSubscriber _matchingEngineEventSubscriber;
+        private readonly IOrderBookService _orderBookService;
         private readonly IOrderCalculator _orderCalculator;
         private readonly IPendingOrderRepository _pendingOrderRepository;
         private readonly ITransactionHistoryRepository _transactionHistoryRepository;
@@ -35,7 +36,7 @@ namespace MatchingEngine.Actor
             IAccountInfoRepository accountInfoRepository, IAssetPairQuoteRepository assetPairQuoteRepository,
             IMarketOrderRepository marketOrderRepository, IPendingOrderRepository pendingOrderRepository,
             ITransactionHistoryRepository transactionHistoryRepository, IOrderCalculator orderCalculator,
-            IMatchingEngineEventSubscriber matchingEngineEventSubscriber)
+            IMatchingEngineEventSubscriber matchingEngineEventSubscriber, IOrderBookService orderBookService)
         {
             _dictionaryProxy = dictionaryProxy;
             _accountInfoRepository = accountInfoRepository;
@@ -45,6 +46,7 @@ namespace MatchingEngine.Actor
             _transactionHistoryRepository = transactionHistoryRepository;
             _orderCalculator = orderCalculator;
             _matchingEngineEventSubscriber = matchingEngineEventSubscriber;
+            _orderBookService = orderBookService;
         }
 
         public Task InitAsync()
@@ -156,7 +158,7 @@ namespace MatchingEngine.Actor
 
         public async Task<IEnumerable<OrderBook>> GetOrderBookAsync()
         {
-            throw new NotImplementedException();
+            return await _orderBookService.BuildOrderBookAsync();
         }
 
         public async Task<IEnumerable<TransactionHistory>> GetTransactionsHistoryAsync(string accountId)

@@ -90,7 +90,9 @@
   <ItemGroup>
     <Compile Include="Events\IMatchingEngineEventSubscriber.cs" />
     <Compile Include="Events\MatchingEngineEventSubscriber.cs" />
+    <Compile Include="Exchange\IOrderBookService.cs" />
     <Compile Include="Exchange\IOrderCalculator.cs" />
+    <Compile Include="Exchange\OrderBookService.cs" />
     <Compile Include="Exchange\OrderCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxy\DictionaryProxy.cs" />

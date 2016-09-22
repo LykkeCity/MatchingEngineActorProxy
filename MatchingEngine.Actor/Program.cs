@@ -28,10 +28,11 @@ namespace MatchingEngine.Actor
                             var dictionaryProxy = new DictionaryProxy(settings.Factories);
 
                             return new MatchingEngine(dictionaryProxy, new AccountInfoRepository(),
-                                assetPairQuoteRepository, new MarketOrderRepository(assetPairQuoteRepository),
+                                assetPairQuoteRepository, new MarketOrderRepository(),
                                 new PendingOrderRepository(), new TransactionHistoryRepository(),
                                 new OrderCalculator(assetPairQuoteRepository, dictionaryProxy),
-                                new MatchingEngineEventSubscriber(settings.MatchingEngine));
+                                new MatchingEngineEventSubscriber(settings.MatchingEngine),
+                                new OrderBookService(assetPairQuoteRepository, dictionaryProxy));
                         }))
                     .GetAwaiter()
                     .GetResult();
