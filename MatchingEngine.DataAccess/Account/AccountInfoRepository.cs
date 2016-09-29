@@ -36,11 +36,14 @@ namespace MatchingEngine.DataAccess.Account
             return _accounts[accountId];
         }
 
-        public async Task UpdateAsync(AccountInfo accountInfo)
+        public Task UpdateAsync(AccountInfo accountInfo)
         {
-            var currentAccountInfo = await GetByIdAsync(accountInfo.AccountId);
+            if (!_accounts.ContainsKey(accountInfo.AccountId))
+                throw new InvalidOperationException();
 
-            _accounts[currentAccountInfo.AccountId] = accountInfo;
+            _accounts[accountInfo.AccountId] = accountInfo;
+
+            return TaskEx.Empty;
         }
 
         public Task AddAsync(AccountInfo accountInfo)
