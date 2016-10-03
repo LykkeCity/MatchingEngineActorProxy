@@ -34,16 +34,7 @@ namespace MatchingEngine.BusinessService.Events
 
         public async Task AssetPairPriceUpdatedAsync(AssetPairQuote assetPair)
         {
-            var message = new BrokeredMessage
-            {
-                Properties =
-                {
-                    {assetPair.AssetPairId, assetPair.AssetPairId},
-                    {assetPair.Ask.ToString(CultureInfo.InvariantCulture), assetPair.Ask},
-                    {assetPair.Bid.ToString(CultureInfo.InvariantCulture), assetPair.Bid},
-                    {assetPair.DateTime.ToString(CultureInfo.InvariantCulture), assetPair.DateTime}
-                }
-            };
+            var message = new BrokeredMessage(assetPair);
 
             await SendMessageAsync(MatchingEngineTopics.AssetPairPriceUpdated, message);
         }

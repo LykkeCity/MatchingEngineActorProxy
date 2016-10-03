@@ -4,10 +4,7 @@ using Microsoft.ServiceFabric.Actors;
 
 namespace MatchingEngine.BusinessService.Events
 {
-    public interface IMatchingEngineEventSubscriber : IMatchingEngineEvents
+    public interface IMatchingEngineEventSubscriber : IMatchingEngineEvents, IEventSubscriber
     {
-        Task SubscribeAsync(string subscriber);
-
-        Task UnsubscribeAsync(string subscriber, string topicName);
     }
 }

@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\IEventSubscriber.cs" />
     <Compile Include="Events\IMatchingEngineEventSubscriber.cs" />
     <Compile Include="Events\MatchingEngineEventSubscriber.cs" />
     <Compile Include="Exchange\IOrderBookService.cs" />
