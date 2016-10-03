@@ -166,6 +166,14 @@ namespace MatchingEngine.Actor
             return await _transactionHistoryRepository.GetAllAsync(accountId);
         }
 
+        public async Task UpdateAccountBalanceAsync(string accountId, double balance)
+        {
+            var entity = await _accountInfoRepository.GetByIdAsync(accountId);
+            entity.Balance = balance;
+
+            await _accountInfoRepository.UpdateAsync(entity);
+        }
+
         protected override async Task OnActivateAsync()
         {
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
